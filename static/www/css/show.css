@@ -3,9 +3,11 @@ body {
 }
 
 #main {
-	display:grid;
-	grid-template-columns: 75vw auto;
-	column-gap: 2em;
+	/*
+	   display:grid;
+	   grid-template-columns: 75vw auto;
+	   column-gap: 2em;
+	*/
 }
 
 #map {

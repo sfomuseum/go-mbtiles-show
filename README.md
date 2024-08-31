@@ -61,7 +61,7 @@ $> ./bin/show \
 	
 2024/08/30 18:16:14 DEBUG Verbose logging enabled
 2024/08/30 18:16:14 DEBUG Start server
-2024/08/30 18:16:14 DEBUG HEAD request succeeded url=http://localhost:64115
+2024/08/30 18:16:14 DEBUG HEAD request succeeded url=http://localhost:64211
 2024/08/30 18:16:14 INFO Server is ready and features are viewable url=http://localhost:64115
 2024/08/30 18:16:22 DEBUG Tile data is nil path=/tiles/2023/12/654/2511.png layer=2023
 2024/08/30 18:16:22 DEBUG Tile data is nil path=/tiles/2023/12/655/2511.png layer=2023
