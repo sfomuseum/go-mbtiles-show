@@ -53,6 +53,10 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 		tiles_catalog[k] = v
 	}
 
+	for k, v := range opts.VectorCatalog {
+		tiles_catalog[k] = v
+	}
+
 	mbtiles_handler, err := mbtiles_http.MBTilesHandler(tiles_catalog)
 
 	if err != nil {
@@ -68,10 +72,18 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 		raster_layers[k] = layer_url
 	}
 
+	vector_layers := make(map[string]string, 0)
+
+	for k, _ := range opts.VectorCatalog {
+		layer_url := fmt.Sprintf("/tiles/%s/{z}/{x}/{-y}.mvt", k)
+		vector_layers[k] = layer_url
+	}
+
 	map_cfg := &mapConfig{
 		Provider:     opts.MapProvider,
 		TileURL:      opts.MapTileURI,
 		RasterLayers: raster_layers,
+		VectorLayers: vector_layers,
 	}
 
 	if map_provider == "protomaps" {

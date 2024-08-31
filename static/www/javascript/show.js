@@ -15,14 +15,19 @@ window.addEventListener("load", function load(event){
     
     var init = function(cfg){
 
-	console.log(cfg);
-
 	var base_maps = {};
 	var overlays = {};
 
-	for (k in cfg.raster_layers){
-	    var l = L.tileLayer(cfg.raster_layers[k])
-	    overlays[k] = l;
+	if (cfg.raster_layers){
+	    
+	    for (k in cfg.raster_layers){
+		var l = L.tileLayer(cfg.raster_layers[k])
+		overlays[k] = l;
+	    }
+	}
+
+	if (cfg.vector_layers){
+	    console.log("Vector layers not supported yet.")
 	}
 	
 	switch (cfg.provider) {

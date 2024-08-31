@@ -16,7 +16,7 @@ type RunOptions struct {
 	ProtomapsTheme string
 	Port           int
 	RasterCatalog  map[string]tilepack.MbtilesReader
-	VectorCatalog  map[string]tilepack.MbtilesReader	
+	VectorCatalog  map[string]tilepack.MbtilesReader
 	Browser        www_show.Browser
 	Verbose        bool
 }

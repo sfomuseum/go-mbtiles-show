@@ -8,8 +8,8 @@ type mapConfig struct {
 	TileURL string `json:"tile_url"`
 	// Optional Protomaps configuration details
 	Protomaps    *protomapsConfig  `json:"protomaps,omitempty"`
-	RasterLayers map[string]string `json:"raster_layers"`
-	VectorLayers map[string]string `json:"vector_layers"`	
+	RasterLayers map[string]string `json:"raster_layers,omitempty"`
+	VectorLayers map[string]string `json:"vector_layers,omitempty"`
 }
 
 // protomapsConfig defines configuration details for maps using Protomaps.
