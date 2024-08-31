@@ -2,10 +2,11 @@ package tile
 
 import (
 	"fmt"
-	"github.com/tilezen/go-tilepacks/tilepack"
-	"github.com/aaronland/go-mimetypes"	
 	"regexp"
 	"strconv"
+
+	"github.com/aaronland/go-mimetypes"
+	"github.com/paulmach/orb/maptile"
 )
 
 // TileParser is an interface for parsing URI paths in to *TileRequest instances.
@@ -65,18 +66,14 @@ func (p *SimpleTileParser) Parse(path string) (*TileRequest, error) {
 	if len(t) == 0 {
 		return nil, fmt.Errorf("Unsupported extension '%s'", ext)
 	}
-	
+
 	content_type := t[0]
-	
+
 	z, _ := strconv.ParseUint(match[2], 10, 32)
 	x, _ := strconv.ParseUint(match[3], 10, 32)
 	y, _ := strconv.ParseUint(match[4], 10, 32)
 
-	tile := &tilepack.Tile{
-		Z: uint(z),
-		X: uint(x),
-		Y: uint(y),
-	}
+	tile := maptile.New(uint32(x), uint32(y), maptile.Zoom(z))
 
 	tile_req := &TileRequest{
 		Tile:        tile,

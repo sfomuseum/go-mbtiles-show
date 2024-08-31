@@ -5,18 +5,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	_ "io"
-	_ "log"
 	"log/slog"
 	"net/http"
 	"net/url"
-	_ "os"
 	"strings"
 
-	"github.com/sfomuseum/go-mbtiles-show/static/www"
 	"github.com/sfomuseum/go-http-protomaps"
-	www_show "github.com/sfomuseum/go-www-show"
 	mbtiles_http "github.com/sfomuseum/go-mbtiles-server/http"
+	"github.com/sfomuseum/go-mbtiles-show/static/www"
+	www_show "github.com/sfomuseum/go-www-show"
+	"github.com/tilezen/go-tilepacks/tilepack"
 )
 
 func Run(ctx context.Context) error {
@@ -37,6 +35,11 @@ func RunWithFlagSet(ctx context.Context, fs *flag.FlagSet) error {
 
 func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 
+	if opts.Verbose {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
+		slog.Debug("Verbose logging enabled")
+	}
+
 	mux := http.NewServeMux()
 
 	www_fs := http.FS(www.FS)
@@ -44,29 +47,33 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 
 	//
 
-	mbtiles_handler, err := mbtiles_http.MBTilesHandler(opts.MBTilesCatalog)
+	tiles_catalog := make(map[string]tilepack.MbtilesReader)
+
+	for k, v := range opts.RasterCatalog {
+		tiles_catalog[k] = v
+	}
+
+	mbtiles_handler, err := mbtiles_http.MBTilesHandler(tiles_catalog)
 
 	if err != nil {
 		return err
 	}
 
-	mux.Handle("/tiles", mbtiles_handler)
-	
-	//
+	mux.Handle("/tiles/", mbtiles_handler)
 
-	mbtiles_layers := make(map[string]string, 0)
+	raster_layers := make(map[string]string, 0)
 
-	for k, _ := range opts.MBTilesCatalog {
-		tile_url := fmt.Sprintf("/tiles/%s/{z}/{x}/{-y}.png", k)
-		mbtiles_layers[k] = tile_url
+	for k, _ := range opts.RasterCatalog {
+		layer_url := fmt.Sprintf("/tiles/%s/{z}/{x}/{-y}.png", k)
+		raster_layers[k] = layer_url
 	}
-	
+
 	map_cfg := &mapConfig{
-		Provider:        opts.MapProvider,
-		TileURL:         opts.MapTileURI,
-		MBTilesLayers: mbtiles_layers,
+		Provider:     opts.MapProvider,
+		TileURL:      opts.MapTileURI,
+		RasterLayers: raster_layers,
 	}
-	
+
 	if map_provider == "protomaps" {
 
 		u, err := url.Parse(opts.MapTileURI)

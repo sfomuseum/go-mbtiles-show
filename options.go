@@ -11,21 +11,22 @@ import (
 )
 
 type RunOptions struct {
-	MapProvider     string
-	MapTileURI      string
-	ProtomapsTheme  string
-	Port            int
-	MBTilesCatalog map[string]tilepack.MbtilesReader
-	Browser         www_show.Browser
+	MapProvider    string
+	MapTileURI     string
+	ProtomapsTheme string
+	Port           int
+	RasterCatalog  map[string]tilepack.MbtilesReader
+	Browser        www_show.Browser
+	Verbose        bool
 }
 
 func RunOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*RunOptions, error) {
 
 	flagset.Parse(fs)
 
-	mbtiles_catalog := make(map[string]tilepack.MbtilesReader)
+	raster_catalog := make(map[string]tilepack.MbtilesReader)
 
-	for _, kv := range tiles_config {
+	for _, kv := range raster_tiles {
 
 		k := kv.Key()
 		path := kv.Value().(string)
@@ -36,17 +37,18 @@ func RunOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*RunOptions, 
 			return nil, fmt.Errorf("Failed to create MBTiles reader for %s, %w", path, err)
 		}
 
-		mbtiles_catalog[k] = r
+		raster_catalog[k] = r
 	}
-	
+
 	opts := &RunOptions{
-		MapProvider:     map_provider,
-		MapTileURI:      map_tile_uri,
-		ProtomapsTheme:  protomaps_theme,
-		MBTilesCatalog: mbtiles_catalog,
-		Port:            port,
+		MapProvider:    map_provider,
+		MapTileURI:     map_tile_uri,
+		ProtomapsTheme: protomaps_theme,
+		RasterCatalog:  raster_catalog,
+		Port:           port,
+		Verbose:        verbose,
 	}
-	
+
 	br, err := www_show.NewBrowser(ctx, "web://")
 
 	if err != nil {

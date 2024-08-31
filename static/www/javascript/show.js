@@ -10,7 +10,8 @@ window.addEventListener("load", function load(event){
     var lon = -122.384292;
     var zoom = 12;
     
-    var map = L.map('map').setView([lat, lon], zoom);
+    var map = L.map('map');
+    map.setView([lat, lon], zoom);
     
     var init = function(cfg){
 
@@ -19,8 +20,8 @@ window.addEventListener("load", function load(event){
 	var base_maps = {};
 	var overlays = {};
 
-	for (k in cfg.mbtiles_layers){
-	    var l = L.tileLayer(cfg.mbtiles_layers[k])
+	for (k in cfg.raster_layers){
+	    var l = L.tileLayer(cfg.raster_layers[k])
 	    overlays[k] = l;
 	}
 	
@@ -29,12 +30,10 @@ window.addEventListener("load", function load(event){
 		
 		var tile_url = cfg.tile_url;
 		
-		var tile_layer = L.tileLayer(tile_url, {
-		    maxZoom: 19,
-		});
-
-		base_maps["leaflet"] = tile_layer;
+		var tile_layer = L.tileLayer(tile_url);
 		tile_layer.addTo(map);
+
+		base_maps["leaflet"] = tile_layer;		
 		break;
 		
 	    case "protomaps":		    
@@ -46,8 +45,9 @@ window.addEventListener("load", function load(event){
 		    theme: cfg.protomaps.theme,
 		})
 
-		base_maps["protomaps"] = tile_layer;
 		tile_layer.addTo(map);
+
+		base_maps["protomaps"] = tile_layer;		
 		break;
 		
 	    default:
@@ -55,9 +55,6 @@ window.addEventListener("load", function load(event){
 		return;
 	}
 
-	console.log("BASE", base_maps);
-	console.log("OVERLAYS", overlays);
-	
 	var layerControl = L.control.layers(base_maps, overlays);
 	layerControl.addTo(map);
 	

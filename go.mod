@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/sfomuseum/go-flags v0.10.0
 	github.com/sfomuseum/go-http-protomaps v0.3.0
-	github.com/sfomuseum/go-mbtiles-server v0.0.1
+	github.com/sfomuseum/go-mbtiles-server v0.0.2
 	github.com/sfomuseum/go-www-show v1.0.0
 	github.com/tilezen/go-tilepacks v0.0.0-20230902185537-9a48755ab988
 )
@@ -14,7 +14,7 @@ require (
 	github.com/aaronland/go-http-leaflet v0.5.0 // indirect
 	github.com/aaronland/go-http-rewrite v1.1.0 // indirect
 	github.com/aaronland/go-http-static v0.0.3 // indirect
-	github.com/aaronland/go-mimetypes v0.0.1 // indirect
+	github.com/aaronland/go-mimetypes v0.0.2 // indirect
 	github.com/aaronland/go-roster v1.0.0 // indirect
 	github.com/aaronland/go-string v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.65 // indirect
