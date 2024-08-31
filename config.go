@@ -9,6 +9,7 @@ type mapConfig struct {
 	// Optional Protomaps configuration details
 	Protomaps    *protomapsConfig  `json:"protomaps,omitempty"`
 	RasterLayers map[string]string `json:"raster_layers"`
+	VectorLayers map[string]string `json:"vector_layers"`	
 }
 
 // protomapsConfig defines configuration details for maps using Protomaps.
