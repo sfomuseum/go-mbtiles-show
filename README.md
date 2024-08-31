@@ -20,6 +20,10 @@ This is an early-stage project. It is incomplete and lacking features. Notably:
 
 * The initial map zoom is the [San Francisco International Airport](https://spelunker.whosonfirst.org/id/102527513/). Code to query the extent of each MBTiles database being served needs to be written and then logic about which extent(s) should be the default view needs to be decided on.
 
+* Minimum and maximum zoom levels for MBTiles database layers need to be derived in the Go code and passed down to the JavaScript/Leaflet code.
+
+_I will get to these things eventually but patches are welcome._
+
 ## Tools
 
 ```
