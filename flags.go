@@ -26,7 +26,7 @@ func DefaultFlagSet() *flag.FlagSet {
 
 	fs := flagset.NewFlagSet("show")
 
-	fs.StringVar(&map_provider, "map-provider", "leaflet", "Valid options are: leaflet, protomaps")
+	fs.StringVar(&map_provider, "map-provider", "leaflet", "The map provider to use for a base layer. Valid options are: leaflet, protomaps")
 	fs.StringVar(&map_tile_uri, "map-tile-uri", leaflet_osm_tile_url, "A valid Leaflet tile layer URI. See documentation for special-case (interpolated tile) URIs.")
 	fs.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
 
@@ -37,10 +37,9 @@ func DefaultFlagSet() *flag.FlagSet {
 
 	fs.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Command-line tool for serving MBTiles tiles from an on-demand web server.\n")
-		fmt.Fprintf(os.Stderr, "Usage:\n\t %s path(N) path(N)\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage:\n\t %s [options]\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "Valid options are:\n")
 		fs.PrintDefaults()
-		fmt.Fprintf(os.Stderr, "\nIf the only path as input is \"-\" then data will be read from STDIN.\n\n")
 	}
 
 	return fs
