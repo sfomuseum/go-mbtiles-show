@@ -18,6 +18,9 @@ window.addEventListener("load", function load(event){
     var init_maplibre = function(cfg){
 
 	console.log(cfg);
+
+	// If protomaps
+	// https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles/
 	
 	var map_args = {
             container: 'map',
@@ -54,8 +57,8 @@ window.addEventListener("load", function load(event){
 		// Basically inverted-y coordinates ({-y}) are not supported in maplibre-gl.js
 		// https://maplibre.org/maplibre-style-spec/sources/#raster
 		// https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/CanvasSourceSpecification/
-		// Despite seemingly being supported in the "native" builds... it is at least
-		// by Mapbox. I'm confused...
+		// Despite seemingly being supported in the "native" builds...
+		// https://docs.mapbox.com/ios/maps/api/6.4.1/tile-url-templates.html
 		// https://maplibre.org/maplibre-native/docs/book/design/coordinate-system.html
 		    
 		for (k in cfg.raster_layers){
@@ -101,6 +104,11 @@ window.addEventListener("load", function load(event){
 			'type': 'line',
 			'source': k,
 			'source-layer': k,
+			paint: {
+			    'line-color':'#000000',
+			    'line-width': 1,
+			    'line-opacity': 1
+			}
 		    });
 		}
 	    }

@@ -68,7 +68,7 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 	raster_layers := make(map[string]string, 0)
 
 	for k, _ := range opts.RasterCatalog {
-		layer_url := fmt.Sprintf("/tiles/%s/{z}/{x}/{-y}.png", k)
+		layer_url := fmt.Sprintf("/tiles/%s/{z}/{x}/{y}.png", k)
 		raster_layers[k] = layer_url
 	}
 

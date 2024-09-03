@@ -85,7 +85,13 @@ func (p *SimpleTileParser) Parse(path string) (*TileRequest, error) {
 	x, _ := strconv.ParseUint(match[3], 10, 32)
 	y, _ := strconv.ParseUint(match[4], 10, 32)
 
-	tile := maptile.New(uint32(x), uint32(y), maptile.Zoom(z))
+	// Just always invert the y coordinate because MBTiles
+	// https://gist.github.com/tmcw/4954720
+	// https://stackoverflow.com/questions/46822094/incorrect-coordinates-in-mbtiles-generated-with-tippecanoe
+
+	inverted_y := (1 << z) - 1 - y
+
+	tile := maptile.New(uint32(x), uint32(inverted_y), maptile.Zoom(z))
 
 	tile_req := &TileRequest{
 		Tile:        tile,
