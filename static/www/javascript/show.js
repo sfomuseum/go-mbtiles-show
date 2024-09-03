@@ -8,14 +8,78 @@ window.addEventListener("load", function load(event){
     // SFO 
     var lat = 37.621131;
     var lon = -122.384292;
-    var zoom = 12;
-    
-    var map = L.map('map');
-    map.setView([lat, lon], zoom);
+    var zoom = 14;
     
     var init = function(cfg){
 
-	console.log("INIT", cfg);
+	init_maplibre(cfg);
+    }
+
+    var init_maplibre = function(cfg){
+
+	console.log(cfg);
+	
+	var map_args = {
+            container: 'map',
+	    // bounds: bounds,
+	    center: [ lon, lat ],
+	    zoom: zoom,
+	    style: {
+		version: 8,
+		sources: {
+		    'base': {
+			type: 'raster',
+			tiles: [
+			    cfg.tile_url,
+			],
+			'tileSize': 256,
+		    },
+		},
+		layers: [
+		    {
+			'id': 'base',
+			'type': 'raster',
+			'source': 'base',
+		    }
+		]
+	    }
+	};
+
+	var map = new maplibregl.Map(map_args);
+	
+	map.on('load', () => {
+	    console.log("Map done loading");
+
+	    if (cfg.vector_layers){
+		
+		for (k in cfg.vector_layers){
+
+		    var tile_url = "http://" + location.host + cfg.vector_layers[k];
+		    console.log("ADD", k, tile_url);
+		    
+		    map.addSource(k, {
+			type: 'vector',
+			tiles: [
+			   tile_url,
+			],
+		    });
+		    
+		    map.addLayer({
+			'id': k,
+			'type': 'line',
+			'source': k,
+			'source-layer': k,
+		    });
+		}
+	    }
+	});
+	
+    };
+    
+    var init_leaflet = function(cfg){
+
+	var map = L.map('map');
+	map.setView([lat, lon], zoom);
 	
 	var base_maps = {};
 	var overlays = {};
