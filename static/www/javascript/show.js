@@ -21,7 +21,6 @@ window.addEventListener("load", function load(event){
 	
 	var map_args = {
             container: 'map',
-	    // bounds: bounds,
 	    center: [ lon, lat ],
 	    zoom: zoom,
 	    style: {
@@ -50,6 +49,39 @@ window.addEventListener("load", function load(event){
 	map.on('load', () => {
 	    console.log("Map done loading");
 
+	    if (cfg.raster_layers){
+
+		// Basically inverted-y coordinates ({-y}) are not supported in maplibre-gl.js
+		// https://maplibre.org/maplibre-style-spec/sources/#raster
+		// https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/CanvasSourceSpecification/
+		// Despite seemingly being supported in the "native" builds... it is at least
+		// by Mapbox. I'm confused...
+		// https://maplibre.org/maplibre-native/docs/book/design/coordinate-system.html
+		    
+		for (k in cfg.raster_layers){
+
+		    var tile_url = "http://" + location.host + cfg.raster_layers[k];
+		    console.log("Add raster layer", k, tile_url);
+		    
+		    map.addSource(k, {
+			type: 'raster',
+			tiles: [
+			   tile_url,
+			],
+			tileSize: 256,
+		    });
+		    
+		    map.addLayer({
+			'id': k,
+			'type': 'raster',
+			'source': k,
+			'source-layer': k,
+		    });
+		}
+		
+	    }
+	    
+	    
 	    if (cfg.vector_layers){
 		
 		for (k in cfg.vector_layers){
