@@ -11,13 +11,12 @@ window.addEventListener("load", function load(event){
     var zoom = 14;
     
     var init = function(cfg){
-
+	// console.log(cfg);
+	// init_leaflet(cfg);
 	init_maplibre(cfg);
     }
 
     var init_maplibre = function(cfg){
-
-	console.log(cfg);
 
 	// If protomaps
 	// https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles/
@@ -52,6 +51,8 @@ window.addEventListener("load", function load(event){
 	map.on('load', () => {
 	    console.log("Map done loading");
 
+	    var legend = {};
+	    
 	    if (cfg.raster_layers){
 
 		// Basically inverted-y coordinates ({-y}) are not supported in maplibre-gl.js
@@ -79,7 +80,12 @@ window.addEventListener("load", function load(event){
 			'type': 'raster',
 			'source': k,
 			'source-layer': k,
+			'layout': {
+			    'visibility': 'none'
+			},
 		    });
+
+		    legend[k] = [ k ];		    
 		}
 		
 	    }
@@ -104,14 +110,23 @@ window.addEventListener("load", function load(event){
 			'type': 'line',
 			'source': k,
 			'source-layer': k,
+			'layout': {
+			    'visibility': 'none'
+			},			
 			paint: {
 			    'line-color':'#000000',
 			    'line-width': 1,
 			    'line-opacity': 1
 			}
 		    });
+
+		    legend[k] = [ k ];
 		}
 	    }
+
+	    // Create control
+	    let lc = new LayersControl(legend);
+	    map.addControl(lc);
 	});
 	
     };
@@ -136,29 +151,29 @@ window.addEventListener("load", function load(event){
 	}
 
 	if (cfg.vector_layers){
-
-	    var tiles_styles = {
-		
-		all: function(properties, zoom) {
-		    return {
-			weight: 2,
-			color: 'red',
-			opacity: .5,
-			fillColor: 'yellow',
-			fill: true,
-			radius: 6,
-			fillOpacity: 0.1
-		    }
-		}
-	    };
 	    
 	    for (k in cfg.vector_layers){
 
 		var layer_url = cfg.vector_layers[k]
 
+		var layer_styles = {
+		
+		    k: function(properties, zoom) {
+			return {
+			    weight: 2,
+			    color: 'red',
+			    opacity: .5,
+			    fillColor: 'yellow',
+			    fill: true,
+			    radius: 6,
+			    fillOpacity: 0.1
+			}
+		    }
+		};
+		
 		var layer_opts = {
 		    rendererFactory: L.canvas.tile,
-		    vectorTileLayerStyles: tiles_styles,
+		    vectorTileLayerStyles: layer_styles,
 		    interactive: true,
 		};
 	
