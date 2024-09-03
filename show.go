@@ -75,7 +75,7 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 	vector_layers := make(map[string]string, 0)
 
 	for k, _ := range opts.VectorCatalog {
-		layer_url := fmt.Sprintf("/tiles/%s/{z}/{x}/{-y}.mvt", k)
+		layer_url := fmt.Sprintf("/tiles/%s/{z}/{x}/{y}.mvt", k)
 		vector_layers[k] = layer_url
 	}
 

@@ -61,13 +61,25 @@ func (p *SimpleTileParser) Parse(path string) (*TileRequest, error) {
 	layer := match[1]
 	ext := match[5]
 
-	t := mimetypes.TypesByExtension(ext)
+	var content_type string
 
-	if len(t) == 0 {
-		return nil, fmt.Errorf("Unsupported extension '%s'", ext)
+	switch ext {
+	case "mvt":
+		content_type = "application/vnd.mapbox-vector-tile"
+	case "jpg", "jpeg":
+		content_type = "image/jpeg"
+	case "png":
+		content_type = "image/png"
+	default:
+
+		t := mimetypes.TypesByExtension(ext)
+
+		if len(t) == 0 {
+			return nil, fmt.Errorf("Unsupported extension '%s'", ext)
+		}
+
+		content_type = t[0]
 	}
-
-	content_type := t[0]
 
 	z, _ := strconv.ParseUint(match[2], 10, 32)
 	x, _ := strconv.ParseUint(match[3], 10, 32)

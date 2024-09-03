@@ -60,7 +60,7 @@ window.addEventListener("load", function load(event){
 	
 		var layer = L.vectorGrid.protobuf(layer_url, layer_opts);
 		console.log("Add vector overlay", k, layer_url);
-		overlays[k] = l;		
+		overlays[k] = layer;		
 	    }
 	    
 	}
@@ -95,6 +95,8 @@ window.addEventListener("load", function load(event){
 		return;
 	}
 
+	console.log("Add overlays", overlays);
+	
 	var layerControl = L.control.layers(base_maps, overlays);
 	layerControl.addTo(map);
 	
