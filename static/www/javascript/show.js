@@ -11,17 +11,69 @@ window.addEventListener("load", function load(event){
     var zoom = 14;
     
     var init = function(cfg){
-	// console.log(cfg);
-	// init_leaflet(cfg);
 	init_maplibre(cfg);
     }
 
     var init_maplibre = function(cfg){
 
-	// add the PMTiles plugin to the maplibregl global.
-	// https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles/
-	// const protocol = new pmtiles.Protocol();
-	// maplibregl.addProtocol('pmtiles', protocol.tile);
+	var base_souce = {};
+	var base_layer = {};
+
+	switch (cfg.provider) {
+	    case "leaflet":
+		
+		base_source = {
+		    type: 'raster',
+		    tiles: [
+			cfg.tile_url,
+		    ],
+		    'tileSize': 256,
+		};
+
+		base_layer = {
+		    'id': 'base',
+		    'type': 'raster',
+		    'source': 'base',
+		};
+		
+		break;
+		
+	    case "protomaps":
+
+		// add the PMTiles plugin to the maplibregl global.
+		// https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles/
+		// https://github.com/protomaps/PMTiles/blob/main/js/examples/maplibre.html
+		// https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js
+		
+		const protocol = new pmtiles.Protocol();
+		maplibregl.addProtocol('pmtiles', protocol.tile);
+
+		const p = new pmtiles.PMTiles(cfg.tile_url);
+		protocol.add(p);
+		
+		base_source = {
+		    type: "vector",
+		    url: "pmtiles://" + cfg.tile_url,
+		};
+
+		base_layer = {
+		    id: 'base',
+		    source: 'base',
+		    'source-layer': 'base',
+		    type: "line",
+                    paint: {
+                        "line-color": "#fc8d62",
+                    }
+		};
+		
+		break;
+		
+	    default:
+		console.error("Unsupported provider", cfg.provider)
+		return;
+	}
+
+	// console.log("BASE", base_source, base_layer);
 	
 	var map_args = {
             container: 'map',
@@ -30,30 +82,22 @@ window.addEventListener("load", function load(event){
 	    style: {
 		version: 8,
 		sources: {
-		    'base': {
-			type: 'raster',
-			tiles: [
-			    cfg.tile_url,
-			],
-			'tileSize': 256,
-		    },
+		    'base': base_source,
 		},
 		layers: [
-		    {
-			'id': 'base',
-			'type': 'raster',
-			'source': 'base',
-		    }
+		    base_layer,
 		]
 	    }
 	};
 
+	var legend = {
+	    'base': [ 'base' ],
+	};
+	
 	var map = new maplibregl.Map(map_args);
 	
 	map.on('load', () => {
 	    console.log("Map done loading");
-
-	    var legend = {};
 	    
 	    if (cfg.raster_layers){
 
@@ -132,97 +176,7 @@ window.addEventListener("load", function load(event){
 	});
 	
     };
-    
-    var init_leaflet = function(cfg){
-
-	var map = L.map('map');
-	map.setView([lat, lon], zoom);
-	
-	var base_maps = {};
-	var overlays = {};
-
-	if (cfg.raster_layers){
-	    
-	    for (k in cfg.raster_layers){
-		var layer_url = cfg.raster_layers[k];
-		var l = L.tileLayer(layer_url)
-
-		console.log("Add raster overlay", k, layer_url);		
-		overlays[k] = l;
-	    }
-	}
-
-	if (cfg.vector_layers){
-	    
-	    for (k in cfg.vector_layers){
-
-		var layer_url = cfg.vector_layers[k]
-
-		var layer_styles = {
-		
-		    k: function(properties, zoom) {
-			return {
-			    weight: 2,
-			    color: 'red',
-			    opacity: .5,
-			    fillColor: 'yellow',
-			    fill: true,
-			    radius: 6,
-			    fillOpacity: 0.1
-			}
-		    }
-		};
-		
-		var layer_opts = {
-		    rendererFactory: L.canvas.tile,
-		    vectorTileLayerStyles: layer_styles,
-		    interactive: true,
-		};
-	
-		var layer = L.vectorGrid.protobuf(layer_url, layer_opts);
-		console.log("Add vector overlay", k, layer_url);
-		overlays[k] = layer;		
-	    }
-	    
-	}
-
-	switch (cfg.provider) {
-	    case "leaflet":
-		
-		var tile_url = cfg.tile_url;
-		
-		var tile_layer = L.tileLayer(tile_url);
-		tile_layer.addTo(map);
-
-		base_maps["leaflet"] = tile_layer;		
-		break;
-		
-	    case "protomaps":		    
-		
-		var tile_url = cfg.tile_url;
-		
-		var tile_layer = protomapsL.leafletLayer({
-		    url: tile_url,
-		    theme: cfg.protomaps.theme,
-		})
-
-		tile_layer.addTo(map);
-
-		base_maps["protomaps"] = tile_layer;		
-		break;
-		
-	    default:
-		console.error("Uknown or unsupported map provider");
-		return;
-	}
-
-	console.log("Add overlays", overlays);
-	
-	var layerControl = L.control.layers(base_maps, overlays);
-	layerControl.addTo(map);
-	
-    };
-    
+        
     fetch("/map.json")
 	.then((rsp) => rsp.json())
 	.then((cfg) => {	    
