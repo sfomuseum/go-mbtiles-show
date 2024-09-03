@@ -18,8 +18,10 @@ window.addEventListener("load", function load(event){
 
     var init_maplibre = function(cfg){
 
-	// If protomaps
+	// add the PMTiles plugin to the maplibregl global.
 	// https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles/
+	// const protocol = new pmtiles.Protocol();
+	// maplibregl.addProtocol('pmtiles', protocol.tile);
 	
 	var map_args = {
             container: 'map',
