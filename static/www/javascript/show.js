@@ -15,21 +15,56 @@ window.addEventListener("load", function load(event){
     
     var init = function(cfg){
 
+	console.log("INIT", cfg);
+	
 	var base_maps = {};
 	var overlays = {};
 
 	if (cfg.raster_layers){
 	    
 	    for (k in cfg.raster_layers){
-		var l = L.tileLayer(cfg.raster_layers[k])
+		var layer_url = cfg.raster_layers[k];
+		var l = L.tileLayer(layer_url)
+
+		console.log("Add raster overlay", k, layer_url);		
 		overlays[k] = l;
 	    }
 	}
 
 	if (cfg.vector_layers){
-	    console.log("Vector layers not supported yet.")
-	}
+
+	    var tiles_styles = {
+		
+		all: function(properties, zoom) {
+		    return {
+			weight: 2,
+			color: 'red',
+			opacity: .5,
+			fillColor: 'yellow',
+			fill: true,
+			radius: 6,
+			fillOpacity: 0.1
+		    }
+		}
+	    };
+	    
+	    for (k in cfg.vector_layers){
+
+		var layer_url = cfg.vector_layers[k]
+
+		var layer_opts = {
+		    rendererFactory: L.canvas.tile,
+		    vectorTileLayerStyles: tiles_styles,
+		    interactive: true,
+		};
 	
+		var layer = L.vectorGrid.protobuf(layer_url, layer_opts);
+		console.log("Add vector overlay", k, layer_url);
+		overlays[k] = l;		
+	    }
+	    
+	}
+
 	switch (cfg.provider) {
 	    case "leaflet":
 		

@@ -21,6 +21,7 @@ var map_tile_uri string
 var protomaps_theme string
 
 var raster_tiles multi.KeyValueString
+var vector_tiles multi.KeyValueString
 
 func DefaultFlagSet() *flag.FlagSet {
 
@@ -33,6 +34,8 @@ func DefaultFlagSet() *flag.FlagSet {
 	fs.IntVar(&port, "port", 0, "The port number to listen for requests on (on localhost). If 0 then a random port number will be chosen.")
 
 	fs.Var(&raster_tiles, "raster", "Zero or more {LAYER_NAME}={PATH} pairs referencing MBTiles databases containing raster data.")
+	fs.Var(&vector_tiles, "vector", "Zero or more {LAYER_NAME}={PATH} pairs referencing MBTiles databases containing vector (MVT) data.")
+
 	fs.BoolVar(&verbose, "verbose", false, "Enable verbose (debug) logging.")
 
 	fs.Usage = func() {
