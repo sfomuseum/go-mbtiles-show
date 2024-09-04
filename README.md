@@ -14,13 +14,13 @@ Documentation (`godoc`) is incomplete at this time.
 
 This is an early-stage project. It is incomplete and lacking features. Notably:
 
-* It only supports MBTiles databases with raster data. It does not support vector tiles yet. That's not a feature but a reflection of the need to write this tool in a hurry to debug a problem with a raster tiles database.
-
-* It assumes that raster tiles are encoded as PNG data when constructing URLs and when constructing `Content-Type` headers when returning tile data.
-
 * The initial map zoom is the [San Francisco International Airport](https://spelunker.whosonfirst.org/id/102527513/). Code to query the extent of each MBTiles database being served needs to be written and then logic about which extent(s) should be the default view needs to be decided on.
 
 * Minimum and maximum zoom levels for MBTiles database layers need to be derived in the Go code and passed down to the JavaScript/Leaflet code.
+
+* Use of the [MapLibre-GL.js](https://maplibre.org/maplibre-gl-js/docs/) library is currently necessary to render MBTiles databases with vector data. I haven't figure out how to make it work with plain-vanilla Leaflet yet.
+
+* There is only minimal styling for vector layers.
 
 _I will get to these things eventually but patches are welcome._
 
@@ -110,9 +110,9 @@ $> ./bin/show \
 
 ```
 $> ./bin/show \
+	-map-provider leaflet \
 	-raster 2023=/usr/local/sfomuseum/tiles/sqlite/2023.db \
 	-base-tile-uri 'pmtiles://api?key={PROTOMAPS_API_KEY}' \
-	-map-provider leaflet \
 	-verbose
 	
 go build -mod vendor -ldflags="-s -w" -o bin/show cmd/show/main.go
@@ -122,12 +122,6 @@ go build -mod vendor -ldflags="-s -w" -o bin/show cmd/show/main.go
 2024/09/03 18:26:13 DEBUG HEAD request succeeded url=http://localhost:64604
 2024/09/03 18:26:13 INFO Server is ready and features are viewable url=http://localhost:64604
 ...and so on
-```
-
-The use of local PMTiles is also supported and the `-base-tile-uri` flag should take the form of:
-
-```
-pmtiles:///PATH/TO/DATABASE.db
 ```
 
 #### Caveats:
