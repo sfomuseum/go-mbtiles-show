@@ -23,3 +23,13 @@ body {
 .selected {
 	font-weight: 700;
 }
+
+
+.layers-control {
+	padding: 1rem;
+}
+
+.layers-control .layer-control {
+	display: block;
+	padding: 0.2rem;
+}

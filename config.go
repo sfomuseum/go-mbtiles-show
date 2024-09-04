@@ -5,7 +5,7 @@ type mapConfig struct {
 	// A valid map provider label.
 	Provider string `json:"provider"`
 	// A valid Leaflet tile layer URI.
-	TileURL string `json:"tile_url"`
+	BaseTileURL string `json:"base_tile_url"`
 	// Optional Protomaps configuration details
 	Protomaps    *protomapsConfig  `json:"protomaps,omitempty"`
 	RasterLayers map[string]string `json:"raster_layers,omitempty"`
@@ -14,6 +14,7 @@ type mapConfig struct {
 
 // protomapsConfig defines configuration details for maps using Protomaps.
 type protomapsConfig struct {
+	UsePMTiles bool `json:"use_pmtiles"`
 	// A valid Protomaps theme label
 	Theme string `json:"theme"`
 }
