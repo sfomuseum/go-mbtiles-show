@@ -79,41 +79,56 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 		vector_layers[k] = layer_url
 	}
 
+	if opts.MapProvider == "leaflet" && len(vector_layers) > 0 {
+		slog.Warn("Leaflet map provider does not support rendering vector layers yet.")
+	}
+
 	map_cfg := &mapConfig{
 		Provider:     opts.MapProvider,
-		TileURL:      opts.MapTileURI,
+		BaseTileURL:  opts.BaseTileURI,
 		RasterLayers: raster_layers,
 		VectorLayers: vector_layers,
 	}
 
-	if map_provider == "protomaps" {
+	u, err := url.Parse(opts.BaseTileURI)
 
-		u, err := url.Parse(opts.MapTileURI)
+	if err != nil {
+		return fmt.Errorf("Failed to parse Protomaps tile URL, %w", err)
+	}
 
-		if err != nil {
-			return fmt.Errorf("Failed to parse Protomaps tile URL, %w", err)
-		}
+	switch u.Scheme {
+	case "pmtiles":
 
-		switch u.Scheme {
-		case "file":
+		switch u.Host {
+		case "api":
+			if opts.MapProvider == "maplibre" {
+				slog.Warn("Remote PMTiles endpoints don't seem to work yet.")
+			}
 
+			key := u.Host
+			map_cfg.BaseTileURL = strings.Replace(protomaps_api_tile_url, "{key}", key, 1)
+
+		case "":
 			mux_url, mux_handler, err := protomaps.FileHandlerFromPath(u.Path, "")
 
 			if err != nil {
-				return fmt.Errorf("Failed to determine absolute path for '%s', %v", opts.MapTileURI, err)
+				return fmt.Errorf("Failed to determine absolute path for '%s', %v", opts.BaseTileURI, err)
 			}
 
 			mux.Handle(mux_url, mux_handler)
-			map_cfg.TileURL = mux_url
+			map_cfg.BaseTileURL = mux_url
 
-		case "api":
-			key := u.Host
-			map_cfg.TileURL = strings.Replace(protomaps_api_tile_url, "{key}", key, 1)
+		default:
+			return fmt.Errorf("Unsupported host (%s) for pmtiles base URI", u.Host)
 		}
 
 		map_cfg.Protomaps = &protomapsConfig{
-			Theme: opts.ProtomapsTheme,
+			UsePMTiles: true,
+			Theme:      opts.ProtomapsTheme,
 		}
+
+	default:
+		map_cfg.BaseTileURL = opts.BaseTileURI
 	}
 
 	map_cfg_handler := mapConfigHandler(map_cfg)

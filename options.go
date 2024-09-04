@@ -12,7 +12,7 @@ import (
 
 type RunOptions struct {
 	MapProvider    string
-	MapTileURI     string
+	BaseTileURI    string
 	ProtomapsTheme string
 	Port           int
 	RasterCatalog  map[string]tilepack.MbtilesReader
@@ -58,7 +58,7 @@ func RunOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*RunOptions, 
 
 	opts := &RunOptions{
 		MapProvider:    map_provider,
-		MapTileURI:     map_tile_uri,
+		BaseTileURI:    base_tile_uri,
 		ProtomapsTheme: protomaps_theme,
 		RasterCatalog:  raster_catalog,
 		VectorCatalog:  vector_catalog,

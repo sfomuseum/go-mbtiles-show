@@ -17,7 +17,8 @@ var port int
 var verbose bool
 
 var map_provider string
-var map_tile_uri string
+var base_tile_uri string
+
 var protomaps_theme string
 
 var raster_tiles multi.KeyValueString
@@ -27,8 +28,9 @@ func DefaultFlagSet() *flag.FlagSet {
 
 	fs := flagset.NewFlagSet("show")
 
-	fs.StringVar(&map_provider, "map-provider", "leaflet", "The map provider to use for a base layer. Valid options are: leaflet, protomaps")
-	fs.StringVar(&map_tile_uri, "map-tile-uri", leaflet_osm_tile_url, "A valid Leaflet tile layer URI. See documentation for special-case (interpolated tile) URIs.")
+	fs.StringVar(&map_provider, "map-provider", "maplibre", "The map provider to use for a base layer. Valid options are: leaflet, maplibre, protomaps")
+	fs.StringVar(&base_tile_uri, "base-tile-uri", leaflet_osm_tile_url, "A valid raster tile layer URI.")
+
 	fs.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
 
 	fs.IntVar(&port, "port", 0, "The port number to listen for requests on (on localhost). If 0 then a random port number will be chosen.")
