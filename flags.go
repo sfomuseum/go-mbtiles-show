@@ -29,7 +29,7 @@ func DefaultFlagSet() *flag.FlagSet {
 	fs := flagset.NewFlagSet("show")
 
 	fs.StringVar(&map_provider, "map-provider", "maplibre", "The map provider to use for a base layer. Valid options are: leaflet, maplibre, protomaps")
-	fs.StringVar(&base_tile_uri, "base-tile-uri", leaflet_osm_tile_url, "A valid raster tile layer URI.")
+	fs.StringVar(&base_tile_uri, "base-tile-uri", leaflet_osm_tile_url, "A valid raster tile layer or pmtiles:// URI.")
 
 	fs.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
 

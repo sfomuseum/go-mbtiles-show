@@ -40,7 +40,7 @@ Usage:
 	 ./bin/show [options]
 Valid options are:
   -base-tile-uri string
-    	A valid raster tile layer URI. (default "https://tile.openstreetmap.org/{z}/{x}/{y}.png")
+    	A valid raster tile layer or pmtiles:// URI. (default "https://tile.openstreetmap.org/{z}/{x}/{y}.png")
   -map-provider string
     	The map provider to use for a base layer. Valid options are: leaflet, maplibre, protomaps (default "maplibre")
   -port int
@@ -54,6 +54,24 @@ Valid options are:
   -verbose
     	Enable verbose (debug) logging.
 ```
+
+## Base tile URIs
+
+The default setting for base tiles is to use OpenStreetMap although you can also specify an alternate raster tile URL.
+
+If the `-base-tile-uri` flag starts with `pmtiles://` then a local or remote PMTiles database will be used as the base map. `pmtiles://` URIs take the form of:
+
+```
+pmtiles:///PATH/TO/DATABASE.db
+```
+
+To use a PMTiles database on the local disk. Or:
+
+```
+pmtiles://api?key={PROTOMAPS_API_KEY}
+```
+
+To use PMTiles data return by the [Protomaps API](https://protomaps.com/dashboard).
 
 ## Examples
 
@@ -80,6 +98,36 @@ $> ./bin/show \
 2024/08/30 18:16:22 DEBUG Tile data is nil path=/tiles/2023/12/656/2510.png layer=2023
 2024/08/30 18:16:22 DEBUG Tile data is nil path=/tiles/2023/12/655/2512.png layer=2023
 ... and so on
+```
+
+#### Caveats:
+
+* Vector tiles are not supported if the `-map-provider` flag is "leaflet".
+
+### Show an MBTiles database containing raster data using Leaflet and the Protomaps API  for the base map:
+
+![](docs/images/go-mbiles-show-leaflet-pmtiles.png)
+
+```
+$> ./bin/show \
+	-raster 2023=/usr/local/sfomuseum/tiles/sqlite/2023.db \
+	-base-tile-uri 'pmtiles://api?key={PROTOMAPS_API_KEY}' \
+	-map-provider leaflet \
+	-verbose
+	
+go build -mod vendor -ldflags="-s -w" -o bin/show cmd/show/main.go
+2024/09/03 18:26:13 DEBUG Verbose logging enabled
+2024/09/03 18:26:13 WARN Leaflet map provider does not support rendering vector layers yet.
+2024/09/03 18:26:13 DEBUG Start server
+2024/09/03 18:26:13 DEBUG HEAD request succeeded url=http://localhost:64604
+2024/09/03 18:26:13 INFO Server is ready and features are viewable url=http://localhost:64604
+...and so on
+```
+
+The use of local PMTiles is also supported and the `-base-tile-uri` flag should take the form of:
+
+```
+pmtiles:///PATH/TO/DATABASE.db
 ```
 
 #### Caveats:
@@ -133,6 +181,7 @@ $> ./bin/show \
 
 * There is currently only a single "line" based style for all vector layers.
 * There is currently only a single "line" based style for base maps derived from a PMTiles database targeting the "roads" layer.
+* Use of the `pmtiles://api?key={KEY}` URI for the `-base-tile-uri` flag does not trigger any errors but does not yield any map data. I don't know why yet.
 
 ## See also
 

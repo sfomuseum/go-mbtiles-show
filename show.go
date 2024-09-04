@@ -105,7 +105,8 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 				slog.Warn("Remote PMTiles endpoints don't seem to work yet.")
 			}
 
-			key := u.Host
+			q := u.Query()
+			key := q.Get("key")
 			map_cfg.BaseTileURL = strings.Replace(protomaps_api_tile_url, "{key}", key, 1)
 
 		case "":
