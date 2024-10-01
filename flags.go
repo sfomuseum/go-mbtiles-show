@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/sfomuseum/go-flags/flagset"
 	"github.com/sfomuseum/go-flags/multi"
+	"github.com/sfomuseum/go-www-show/v2"
 )
 
 // Put these in go-www-show
@@ -15,6 +17,8 @@ const protomaps_api_tile_url string = "https://api.protomaps.com/tiles/v3/{z}/{x
 
 var port int
 var verbose bool
+
+var browser_uri string
 
 var map_provider string
 var base_tile_uri string
@@ -27,6 +31,13 @@ var vector_tiles multi.KeyValueString
 func DefaultFlagSet() *flag.FlagSet {
 
 	fs := flagset.NewFlagSet("show")
+
+	browser_schemes := show.BrowserSchemes()
+	str_schemes := strings.Join(browser_schemes, ",")
+
+	browser_desc := fmt.Sprintf("A valid sfomuseum/go-www-show/v2.Browser URI. Valid options are: %s", str_schemes)
+
+	fs.StringVar(&browser_uri, "browser-uri", "web://", browser_desc)
 
 	fs.StringVar(&map_provider, "map-provider", "maplibre", "The map provider to use for a base layer. Valid options are: leaflet, maplibre, protomaps")
 	fs.StringVar(&base_tile_uri, "base-tile-uri", leaflet_osm_tile_url, "A valid raster tile layer or pmtiles:// URI.")

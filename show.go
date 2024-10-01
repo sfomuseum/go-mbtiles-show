@@ -13,7 +13,7 @@ import (
 	"github.com/sfomuseum/go-http-protomaps"
 	mbtiles_http "github.com/sfomuseum/go-mbtiles-server/http"
 	"github.com/sfomuseum/go-mbtiles-show/static/www"
-	www_show "github.com/sfomuseum/go-www-show"
+	www_show "github.com/sfomuseum/go-www-show/v2"
 	"github.com/tilezen/go-tilepacks/tilepack"
 )
 
