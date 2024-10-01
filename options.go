@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/sfomuseum/go-flags/flagset"
-	www_show "github.com/sfomuseum/go-www-show"
+	www_show "github.com/sfomuseum/go-www-show/v2"
 	"github.com/tilezen/go-tilepacks/tilepack"
 )
 
@@ -66,7 +66,7 @@ func RunOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*RunOptions, 
 		Verbose:        verbose,
 	}
 
-	br, err := www_show.NewBrowser(ctx, "web://")
+	br, err := www_show.NewBrowser(ctx, browser_uri)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create new browser, %w", err)

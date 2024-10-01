@@ -31,6 +31,12 @@ $> make cli
 go build -mod vendor -ldflags="-s -w" -o bin/show cmd/show/main.go
 ```
 
+To enable use the [WebViewBrowser `Browser` implementation](https://github.com/sfomuseum/go-www-show?tab=readme-ov-file#webviewbrowser-webview) tools will need to be build with the `webview` tag set. For example:
+
+```
+$> go build -mod vendor -ldflags="-s -w" -tags webview -o bin/show cmd/show/main.go
+```
+
 ### show
 
 ```
@@ -41,6 +47,8 @@ Usage:
 Valid options are:
   -base-tile-uri string
     	A valid raster tile layer or pmtiles:// URI. (default "https://tile.openstreetmap.org/{z}/{x}/{y}.png")
+  -browser-uri string
+    	A valid sfomuseum/go-www-show/v2.Browser URI. Valid options are: web:// (default "web://")	
   -map-provider string
     	The map provider to use for a base layer. Valid options are: leaflet, maplibre, protomaps (default "maplibre")
   -port int
