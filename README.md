@@ -31,6 +31,12 @@ $> make cli
 go build -mod vendor -ldflags="-s -w" -o bin/show cmd/show/main.go
 ```
 
+To enable use the [WebViewBrowser `Browser` implementation](https://github.com/sfomuseum/go-www-show?tab=readme-ov-file#webviewbrowser-webview) tools will need to be build with the `webview` tag set. For example:
+
+```
+$> go build -mod vendor -ldflags="-s -w" -tags webview -o bin/show cmd/show/main.go
+```
+
 ### show
 
 ```
