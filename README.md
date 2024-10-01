@@ -41,6 +41,8 @@ Usage:
 Valid options are:
   -base-tile-uri string
     	A valid raster tile layer or pmtiles:// URI. (default "https://tile.openstreetmap.org/{z}/{x}/{y}.png")
+  -browser-uri string
+    	A valid sfomuseum/go-www-show/v2.Browser URI. Valid options are: web:// (default "web://")	
   -map-provider string
     	The map provider to use for a base layer. Valid options are: leaflet, maplibre, protomaps (default "maplibre")
   -port int
