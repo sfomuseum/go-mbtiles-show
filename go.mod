@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/sfomuseum/go-flags v0.10.0
 	github.com/sfomuseum/go-http-protomaps v0.3.0
-	github.com/sfomuseum/go-mbtiles-server v0.0.4
+	github.com/sfomuseum/go-mbtiles-server v0.0.5
 	github.com/sfomuseum/go-www-show/v2 v2.0.0
 	github.com/tilezen/go-tilepacks v0.0.0-20240928014516-f75e8450bbe0
 )
