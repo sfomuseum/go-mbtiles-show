@@ -2,15 +2,12 @@ package show
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/url"
-	"strings"
 
-	"github.com/sfomuseum/go-http-protomaps"
+	"github.com/aaronland/go-http-maps/v2"
 	mbtiles_http "github.com/sfomuseum/go-mbtiles-server/http"
 	"github.com/sfomuseum/go-mbtiles-show/static/www"
 	www_show "github.com/sfomuseum/go-www-show/v2"
@@ -65,6 +62,19 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 
 	mux.Handle("/tiles/", mbtiles_handler)
 
+	map_opts := &maps.AssignMapConfigHandlerOptions{
+		MapProvider:          opts.MapProvider,
+		MapTileURI:           opts.BaseTileURI,
+		ProtomapsTheme:       opts.ProtomapsTheme,
+		ProtomapsMaxDataZoom: opts.ProtomapsMaxDataZoom,
+	}
+
+	err = maps.AssignMapConfigHandler(map_opts, mux, "/map.json")
+
+	if err != nil {
+		return fmt.Errorf("Failed to assign map config handler, %w", err)
+	}
+
 	raster_layers := make(map[string]string, 0)
 
 	for k, _ := range opts.RasterCatalog {
@@ -83,58 +93,14 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 		slog.Warn("Leaflet map provider does not support rendering vector layers yet.")
 	}
 
-	map_cfg := &mapConfig{
-		Provider:     opts.MapProvider,
-		BaseTileURL:  opts.BaseTileURI,
+	local_cfg := &LocalConfig{
 		RasterLayers: raster_layers,
 		VectorLayers: vector_layers,
 	}
 
-	u, err := url.Parse(opts.BaseTileURI)
+	local_cfg_handler := LocalConfigHandler(local_cfg)
 
-	if err != nil {
-		return fmt.Errorf("Failed to parse Protomaps tile URL, %w", err)
-	}
-
-	switch u.Scheme {
-	case "pmtiles":
-
-		switch u.Host {
-		case "api":
-			if opts.MapProvider == "maplibre" {
-				slog.Warn("Remote PMTiles endpoints don't seem to work yet.")
-			}
-
-			q := u.Query()
-			key := q.Get("key")
-			map_cfg.BaseTileURL = strings.Replace(protomaps_api_tile_url, "{key}", key, 1)
-
-		case "":
-			mux_url, mux_handler, err := protomaps.FileHandlerFromPath(u.Path, "")
-
-			if err != nil {
-				return fmt.Errorf("Failed to determine absolute path for '%s', %v", opts.BaseTileURI, err)
-			}
-
-			mux.Handle(mux_url, mux_handler)
-			map_cfg.BaseTileURL = mux_url
-
-		default:
-			return fmt.Errorf("Unsupported host (%s) for pmtiles base URI", u.Host)
-		}
-
-		map_cfg.Protomaps = &protomapsConfig{
-			UsePMTiles: true,
-			Theme:      opts.ProtomapsTheme,
-		}
-
-	default:
-		map_cfg.BaseTileURL = opts.BaseTileURI
-	}
-
-	map_cfg_handler := mapConfigHandler(map_cfg)
-
-	mux.Handle("/map.json", map_cfg_handler)
+	mux.Handle("/config.json", local_cfg_handler)
 
 	www_show_opts := &www_show.RunOptions{
 		Port:    opts.Port,
@@ -143,24 +109,4 @@ func RunWithOptions(ctx context.Context, opts *RunOptions) error {
 	}
 
 	return www_show.RunWithOptions(ctx, www_show_opts)
-}
-
-func mapConfigHandler(cfg *mapConfig) http.Handler {
-
-	fn := func(rsp http.ResponseWriter, req *http.Request) {
-
-		rsp.Header().Set("Content-type", "application/json")
-
-		enc := json.NewEncoder(rsp)
-		err := enc.Encode(cfg)
-
-		if err != nil {
-			slog.Error("Failed to encode map config", "error", err)
-			http.Error(rsp, "Internal server error", http.StatusInternalServerError)
-		}
-
-		return
-	}
-
-	return http.HandlerFunc(fn)
 }

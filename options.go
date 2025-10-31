@@ -11,14 +11,15 @@ import (
 )
 
 type RunOptions struct {
-	MapProvider    string
-	BaseTileURI    string
-	ProtomapsTheme string
-	Port           int
-	RasterCatalog  map[string]tilepack.MbtilesReader
-	VectorCatalog  map[string]tilepack.MbtilesReader
-	Browser        www_show.Browser
-	Verbose        bool
+	MapProvider          string
+	BaseTileURI          string
+	ProtomapsTheme       string
+	ProtomapsMaxDataZoom int
+	Port                 int
+	RasterCatalog        map[string]tilepack.MbtilesReader
+	VectorCatalog        map[string]tilepack.MbtilesReader
+	Browser              www_show.Browser
+	Verbose              bool
 }
 
 func RunOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*RunOptions, error) {
@@ -57,13 +58,14 @@ func RunOptionsFromFlagSet(ctx context.Context, fs *flag.FlagSet) (*RunOptions, 
 	}
 
 	opts := &RunOptions{
-		MapProvider:    map_provider,
-		BaseTileURI:    base_tile_uri,
-		ProtomapsTheme: protomaps_theme,
-		RasterCatalog:  raster_catalog,
-		VectorCatalog:  vector_catalog,
-		Port:           port,
-		Verbose:        verbose,
+		MapProvider:          map_provider,
+		BaseTileURI:          base_tile_uri,
+		ProtomapsTheme:       protomaps_theme,
+		ProtomapsMaxDataZoom: protomaps_max_data_zoom,
+		RasterCatalog:        raster_catalog,
+		VectorCatalog:        vector_catalog,
+		Port:                 port,
+		Verbose:              verbose,
 	}
 
 	br, err := www_show.NewBrowser(ctx, browser_uri)
