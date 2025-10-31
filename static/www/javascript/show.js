@@ -10,45 +10,46 @@ window.addEventListener("load", function load(event){
     var lon = -122.384292;
     var zoom = 14;
     
-    var init = function(cfg){
+    const init = function(local_cfg, map_cfg){
 
-	switch (cfg.provider) {
+	switch (map_cfg.provider) {
 	    case "leaflet":
-		init_leaflet(cfg);
+		init_leaflet(local_cfg, map_cfg);
 		break;
 	    default:		
-		init_maplibre(cfg);
+		init_maplibre(local_cfg, map_cfg);
 		break;
 	}
     }
 
-    var init_maplibre = function(cfg){
+    const init_maplibre = function(local_cfg, map_cfg){
 
-	console.log("base tile url", cfg.base_tile_url);
+	console.debug("Initialize maplibre w/ base tile url", map_cfg.tile_url);
+	console.debug("Initialize maplibre w/ local config", local_cfg);	
 	
 	var base_souce = {};
 	var base_layer = {};
 
-	if (cfg.protomaps && cfg.protomaps.use_pmtiles) {
+	if (map_cfg.protomaps && map_cfg.protomaps.use_pmtiles) {
 
 	    // add the PMTiles plugin to the maplibregl global.
 	    // https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles/
 	    // https://github.com/protomaps/PMTiles/blob/main/js/examples/maplibre.html
 	    // https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js
 
-	    if (! cfg.base_tile_url.startsWith("http")){
-		cfg.base_tile_url = "http://" + location.host + cfg.base_tile_url;
+	    if (! map_cfg.tile_url.startsWith("http")){
+		map_cfg.tile_url = "http://" + location.host + map_cfg.tile_url;
 	    }
 	    
 	    const protocol = new pmtiles.Protocol();
 	    maplibregl.addProtocol('pmtiles', protocol.tile);
 	    
-	    const p = new pmtiles.PMTiles(cfg.base_tile_url);
+	    const p = new pmtiles.PMTiles(map_cfg.tile_url);
 	    protocol.add(p);
 	    
 	    base_source = {
 		type: "vector",
-		url: "pmtiles://" + cfg.base_tile_url,
+		url: "pmtiles://" + map_cfg.tile_url,
 	    };
 	    
 	    base_layer = {
@@ -68,7 +69,7 @@ window.addEventListener("load", function load(event){
 	    base_source = {
 		type: 'raster',
 		tiles: [
-		    cfg.base_tile_url,
+		    map_cfg.tile_url,
 		],
 		'tileSize': 256,
 	    };
@@ -106,10 +107,8 @@ window.addEventListener("load", function load(event){
 	
 	map.on('load', () => {
 	    
-	    console.log("Map done loading");
-	    
-	    if (cfg.raster_layers){
-
+	    if (local_cfg.raster_layers){
+		
 		// Basically inverted-y coordinates ({-y}) are not supported in maplibre-gl.js
 		// https://maplibre.org/maplibre-style-spec/sources/#raster
 		// https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/CanvasSourceSpecification/
@@ -117,10 +116,10 @@ window.addEventListener("load", function load(event){
 		// https://docs.mapbox.com/ios/maps/api/6.4.1/tile-url-templates.html
 		// https://maplibre.org/maplibre-native/docs/book/design/coordinate-system.html
 		    
-		for (k in cfg.raster_layers){
-
-		    var tile_url = "http://" + location.host + cfg.raster_layers[k];
-		    console.log("Add raster layer", k, tile_url);
+		for (k in local_cfg.raster_layers){
+		    
+		    var tile_url = "http://" + location.host + local_cfg.raster_layers[k];
+		    console.debug("Add raster layer", k, tile_url);
 		    
 		    map.addSource(k, {
 			type: 'raster',
@@ -145,12 +144,12 @@ window.addEventListener("load", function load(event){
 		
 	    }
 	    
-	    if (cfg.vector_layers){
+	    if (local_cfg.vector_layers){
 		
-		for (k in cfg.vector_layers){
+		for (k in local_cfg.vector_layers){
 
-		    var tile_url = "http://" + location.host + cfg.vector_layers[k];
-		    console.log("ADD", k, tile_url);
+		    var tile_url = "http://" + location.host + local_cfg.vector_layers[k];
+		    console.debug("Add vector layer", k, tile_url);
 		    
 		    map.addSource(k, {
 			type: 'vector',
@@ -185,7 +184,7 @@ window.addEventListener("load", function load(event){
 	
     };
 
-    var init_leaflet = function(cfg){
+    const init_leaflet = function(local_cfg, map_cfg){
 
 	var map = L.map('map');
 	map.setView([lat, lon], zoom);
@@ -193,25 +192,25 @@ window.addEventListener("load", function load(event){
 	var base_maps = {};
 	var overlays = {};
 
-	if (cfg.raster_layers){
+	if (local_cfg.raster_layers){
 	    
-	    for (k in cfg.raster_layers){
-		var l = L.tileLayer(cfg.raster_layers[k])
+	    for (k in local_cfg.raster_layers){
+		var l = L.tileLayer(local_cfg.raster_layers[k])
 		overlays[k] = l;
 	    }
 	}
 
-	if (cfg.vector_layers){
-	    console.log("Vector layers not supported yet.")
+	if (local_cfg.vector_layers){
+	    console.warn("Vector layers not supported yet.")
 	}
 
-	if (cfg.protomaps && cfg.protomaps.use_pmtiles) {
+	if (map_cfg.protomaps && map_cfg.protomaps.use_pmtiles) {
 
-	    var tile_url = cfg.base_tile_url;
+	    var tile_url = map_cfg.tile_url;
 	    
 	    var tile_layer = protomapsL.leafletLayer({
 		url: tile_url,
-		theme: cfg.protomaps.theme,
+		theme: map_cfg.protomaps.theme,
 	    })
 	    
 	    tile_layer.addTo(map);
@@ -219,7 +218,7 @@ window.addEventListener("load", function load(event){
 	    
 	} else {
 		
-	    var tile_url = cfg.base_tile_url;
+	    var tile_url = map_cfg.tile_url;
 		
 	    var tile_layer = L.tileLayer(tile_url);
 	    tile_layer.addTo(map);
@@ -230,14 +229,24 @@ window.addEventListener("load", function load(event){
 	var layerControl = L.control.layers(base_maps, overlays);
 	layerControl.addTo(map);	
     };
+
+    console.debug("Fetch local config");
     
-    fetch("/map.json")
-	.then((rsp) => rsp.json())
-	.then((cfg) => {	    
-	    init(cfg);
-	}).catch((err) => {
-	    console.error("Failed to retrieve map config", err);
+    fetch("/config.json")
+	.then(rsp => rsp.json())
+	.then((local_cfg) => {
+
+	    console.debug("Fetch map config");
+	    
+	    fetch("/map.json")
+		.then((rsp) => rsp.json())
+		.then((map_cfg) => {	    
+		    init(local_cfg, map_cfg);
+		}).catch((err) => {
+		    console.error("Failed to retrieve map config", err);
+		});
+        }).catch((err) => {
+	    console.error("Failed to retrieve local config", err);
 	});
-        
     
 });
