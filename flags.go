@@ -24,6 +24,7 @@ var map_provider string
 var base_tile_uri string
 
 var protomaps_theme string
+var protomaps_max_data_zoom int
 
 var raster_tiles multi.KeyValueString
 var vector_tiles multi.KeyValueString
@@ -43,6 +44,7 @@ func DefaultFlagSet() *flag.FlagSet {
 	fs.StringVar(&base_tile_uri, "base-tile-uri", leaflet_osm_tile_url, "A valid raster tile layer or pmtiles:// URI.")
 
 	fs.StringVar(&protomaps_theme, "protomaps-theme", "white", "A valid Protomaps theme label.")
+	fs.IntVar(&protomaps_max_data_zoom, "protomaps-max-data-zoom", 0, "...")
 
 	fs.IntVar(&port, "port", 0, "The port number to listen for requests on (on localhost). If 0 then a random port number will be chosen.")
 

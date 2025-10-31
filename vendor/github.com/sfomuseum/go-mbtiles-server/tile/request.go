@@ -3,7 +3,7 @@ package tile
 import (
 	"fmt"
 
-	"github.com/aaronland/go-mimetypes"
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/paulmach/orb/maptile"
 )
 
@@ -20,11 +20,15 @@ type TileRequest struct {
 // String returns a relative URI path for the TileRequest instance.
 func (t *TileRequest) String() string {
 
-	ext := mimetypes.ExtensionsByType(t.ContentType)
+	var ext string
+	
+	m := mimetype.Lookup(t.ContentType)
 
-	if len(ext) == 0 {
-		ext = []string{".???"}
+	if m == nil {
+		ext =".???"
+	} else {
+		ext = m.Extension()
 	}
 
-	return fmt.Sprintf("%s/%d/%d/%d.%s", t.Layer, t.Tile.Z, t.Tile.X, t.Tile.Y, ext[0])
+	return fmt.Sprintf("%s/%d/%d/%d.%s", t.Layer, t.Tile.Z, t.Tile.X, t.Tile.Y, ext)
 }

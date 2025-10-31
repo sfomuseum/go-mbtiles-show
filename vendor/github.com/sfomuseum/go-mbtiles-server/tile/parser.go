@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/aaronland/go-mimetypes"
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/paulmach/orb/maptile"
 )
 
@@ -72,13 +72,13 @@ func (p *SimpleTileParser) Parse(path string) (*TileRequest, error) {
 		content_type = "image/png"
 	default:
 
-		t := mimetypes.TypesByExtension(ext)
+		m := mimetype.Lookup(ext)
 
-		if len(t) == 0 {
+		if m == nil {
 			return nil, fmt.Errorf("Unsupported extension '%s'", ext)
 		}
 
-		content_type = t[0]
+		content_type = m.String()
 	}
 
 	z, _ := strconv.ParseUint(match[2], 10, 32)
