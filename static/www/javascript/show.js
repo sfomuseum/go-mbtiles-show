@@ -30,20 +30,14 @@ window.addEventListener("load", function load(event){
 	var base_souce = {};
 	var base_layer = {};
 
-	if (map_cfg.protomaps && map_cfg.protomaps.use_pmtiles) {
-
-	    // add the PMTiles plugin to the maplibregl global.
-	    // https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles/
-	    // https://github.com/protomaps/PMTiles/blob/main/js/examples/maplibre.html
-	    // https://unpkg.com/pmtiles@3.0.7/dist/pmtiles.js
-
-	    if (! map_cfg.tile_url.startsWith("http")){
-		map_cfg.tile_url = "http://" + location.host + map_cfg.tile_url;
-	    }
+	// https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles-source-and-protocol/
+	
+	if (map_cfg.protomaps){
 	    
 	    const protocol = new pmtiles.Protocol();
 	    maplibregl.addProtocol('pmtiles', protocol.tile);
-	    
+
+	    console.debug("Add PMTiles", map_cfg.tile_url);
 	    const p = new pmtiles.PMTiles(map_cfg.tile_url);
 	    protocol.add(p);
 	    
@@ -64,7 +58,6 @@ window.addEventListener("load", function load(event){
 	    };
 	    
 	} else {
-
 	    
 	    base_source = {
 		type: 'raster',
@@ -207,11 +200,18 @@ window.addEventListener("load", function load(event){
 	if (map_cfg.protomaps && map_cfg.protomaps.use_pmtiles) {
 
 	    var tile_url = map_cfg.tile_url;
-	    
-	    var tile_layer = protomapsL.leafletLayer({
+
+	    var pm_args = {
 		url: tile_url,
 		theme: map_cfg.protomaps.theme,
-	    })
+		flavor: map_cfg.protomaps.theme,
+	    };
+	    
+	    if ("max_data_zoom" in map_cfg.protomaps){
+		pm_args.maxDataZoom = map_cfg.protomaps.max_data_zoom;
+	    }
+	    
+	    var tile_layer = protomapsL.leafletLayer(pm_args);
 	    
 	    tile_layer.addTo(map);
 	    base_maps["protomaps"] = tile_layer;
